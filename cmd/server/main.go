@@ -10,6 +10,26 @@ import (
 	"net/http"
 )
 
+func getPlayers(searchUrl string) ([]players.Player, error) {
+	res, err := http.Get(searchUrl)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("search url %s resulted in a bad response", searchUrl)
+	}
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	apiResp := players.PlayerApiRes{}
+	if err := json.Unmarshal(data, &apiResp); err != nil {
+		return nil, err
+	}
+	return apiResp.People, nil
+}
+
 func main() {
 	mux := http.NewServeMux()
 
@@ -22,27 +42,29 @@ func main() {
 		fmt.Println(req.URL)
 		searchName := req.PathValue("fullName")
 		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/search?names=%s", searchName)
-		res, err := http.Get(searchUrl)
+		players, err := getPlayers(searchUrl)
 		if err != nil {
 			responses.RespondError(w, 404, fmt.Sprintf("%v", err))
+		} else {
+			responses.RespondJSON(w, 200, players)
 		}
-		if res.StatusCode != 200 {
-			responses.RespondError(w, 404, "Bad response from fetching player data")
-		}
+	})
 
-		data, err := io.ReadAll(res.Body)
+	//Returns the player who's id matches the query
+	mux.HandleFunc("/api/player/{id}", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Println(req.URL)
+		searchId := req.PathValue("id")
+		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/%s", searchId)
+		players, err := getPlayers(searchUrl)
 		if err != nil {
 			responses.RespondError(w, 404, fmt.Sprintf("%v", err))
+			return
 		}
-		apiResp := players.PlayerApiRes{}
-		if err := json.Unmarshal(data, &apiResp); err != nil {
-			responses.RespondError(w, 404, fmt.Sprintf("%v", err))
+		if len(players) == 0 {
+			responses.RespondError(w, 404, fmt.Sprintf("No Player with id=%s", searchId))
+			return
 		}
-
-		if len(apiResp.People) == 0 {
-			responses.RespondError(w, 404, "No players found maching that name")
-		}
-		_ = responses.RespondJSON(w, 200, apiResp.People[0])
+		responses.RespondJSON(w, 200, players[0])
 	})
 
 	http.ListenAndServe(":8080", mux)
