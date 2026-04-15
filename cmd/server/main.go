@@ -6,7 +6,6 @@ import (
 	"github.com/BiryaniJedi/slam_stats/players"
 	"github.com/BiryaniJedi/slam_stats/responses"
 	"io"
-	// "log"
 	"net/http"
 )
 
@@ -39,7 +38,6 @@ func main() {
 
 	//Returns first match of searching mlb api with given name
 	mux.HandleFunc("/api/players/{fullName}", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println(req.URL)
 		searchName := req.PathValue("fullName")
 		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/search?names=%s", searchName)
 		players, err := getPlayers(searchUrl)
@@ -52,7 +50,6 @@ func main() {
 
 	//Returns the player who's id matches the query
 	mux.HandleFunc("/api/player/{id}", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println(req.URL)
 		searchId := req.PathValue("id")
 		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/%s", searchId)
 		players, err := getPlayers(searchUrl)
@@ -66,6 +63,9 @@ func main() {
 		}
 		responses.RespondJSON(w, 200, players[0])
 	})
+
+	// Serve frontend static files in production
+	mux.Handle("/", http.FileServer(http.Dir("./frontend/dist")))
 
 	http.ListenAndServe(":8080", mux)
 }
