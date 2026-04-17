@@ -6,6 +6,21 @@
         if (!res.ok) throw new Error('Player not found.')
         return await res.json()
     }
+
+    /*
+        type PlayerResponse struct {
+            Active     bool     `json:"active"`
+            Id         int      `json:"id"`
+            FirstName  string   `json:"firstName"`
+            LastName   string   `json:"lastName"`
+            BirthDate  string   `json:"birthDate"`
+            Height_in  float64  `json:"height_in"`
+            Weight_lbs float64  `json:"weight_lbs"`
+            PrimaryPos FieldPos `json:"primaryPosition"`
+            BatSide    string   `json:"batSide"`
+            PitchHand  string   `json:"pitchHand"`
+        }
+    */
 </script>
 
 <div class="page">
@@ -24,10 +39,17 @@
                 <h1 class="name">{player.firstName} {player.lastName}</h1>
                 <div class="tags">
                     <span class="tag">{player.primaryPosition.name}</span>
-                    <span class="tag">{player.currentAge} yrs</span>
+                    <span class="tag">{player.birthDate} yrs</span>
+                    <span class="tag">Height: {Math.trunc(player.height_in)}in</span>
+                    <span class="tag">Weight: {player.weight_lbs}lbs</span>
+                    <span class="tag">Bat Side: {player.batSide}</span>
+                    <span class="tag">Pitch Hand: {player.pitchHand}</span>
                     <span class="tag {player.active ? 'active' : 'inactive'}">
                         {player.active ? 'Active' : 'Inactive'}
                     </span>
+                    {#if player.active}
+                        <span class="tag">{player.currentTeam.name}</span>
+                    {/if}
                 </div>
             </div>
         </div>

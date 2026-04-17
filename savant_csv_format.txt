@@ -1,0 +1,56 @@
+game_pk                         :: int
+game_date                       :: time.Parse(time.DateOnly, <time_from_csv>)
+at_bat_number                   :: int
+pitch_number                    :: int
+pitcher                         :: int
+batter                          :: int
+home_team                       :: string
+away_team                       :: string
+inning                          :: int
+inning_topbot                   :: string ("Top" | "Bot")
+balls                           :: int
+strikes                         :: int
+outs_when_up                    :: int
+
+================ids of baserunners=============
+on_1b                           :: int | nil
+on_2b                           :: int | nil
+on_3b                           :: int | nil
+
+================ids of fielders================
+fielder_1                       :: int
+fielder_2                       :: int
+    .
+    .
+    .
+fielder_9                       :: int
+
+stand - batter hand this ab     :: string ("R" | "L")
+pitch_type                      :: string
+release_speed                   :: float
+effective_speed                 :: float
+release_spin_rate               :: int
+spin_axis                       :: int
+pfx_x                           :: float
+pfx_z                           :: float
+plate_x                         :: float
+plate_z                         :: float
+zone                            :: int
+release_extension               :: float
+events                          :: string | nil
+description                     :: string
+bb_type                         :: string
+launch_speed                    :: float | nil
+launch_angle                    :: int | nil
+hit_distance_sc                 :: int | nil
+estimated_ba_using_speedangle   :: float | nil
+estimated_woba_using_speedangle :: float | nil
+woba_value                      :: float | nil
+woba_denom                      :: int | nil
+babip_value                     :: int | nil
+delta_run_exp                   :: float
+delta_win_exp                   :: float
+
+
+=====Download url format=====
+https://baseballsavant.mlb.com/statcast_search/csv?all=true&batter_stands=&game_date_gt=2026-04-14&game_date_lt=2026-04-15&group_by=name&hfAB=&hfBBL=&hfBBT=&hfC=&hfFlag=&hfGT=R%7CPO%7CF%7CD%7CL%7CW%7CS%7CA%7C&hfInfield=&hfInn=&hfMo=&hfNewZones=&hfOpponent=&hfOutfield=&hfOuts=&hfPR=&hfPT=&hfPull=&hfRO=&hfSA=&hfSea=&hfSit=&hfStadium=&hfTeam=&hfZ=&home_road=&metric_1=&min_pas=0&min_pitches=0&min_results=0&minors=false&pitcher_throws=&player_event_sort=api_p_release_speed&player_type=pitcher&position=&sort_col=pitches&sort_order=desc&type=details&

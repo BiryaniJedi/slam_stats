@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/BiryaniJedi/slam_stats/players"
 	"github.com/BiryaniJedi/slam_stats/responses"
+	"github.com/BiryaniJedi/slam_stats/utils"
 	"io"
 	"net/http"
 )
@@ -22,7 +23,7 @@ func getPlayers(searchUrl string) ([]players.Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	apiResp := players.PlayerApiRes{}
+	apiResp := players.PlayerRespMLBAM{}
 	if err := json.Unmarshal(data, &apiResp); err != nil {
 		return nil, err
 	}
@@ -40,28 +41,35 @@ func main() {
 	mux.HandleFunc("/api/players/{fullName}", func(w http.ResponseWriter, req *http.Request) {
 		searchName := req.PathValue("fullName")
 		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/search?names=%s", searchName)
-		players, err := getPlayers(searchUrl)
+		playersList, err := getPlayers(searchUrl)
 		if err != nil {
 			responses.RespondError(w, 404, fmt.Sprintf("%v", err))
-		} else {
-			responses.RespondJSON(w, 200, players)
+			return
 		}
+		playerResps, _ := utils.MapSafe(playersList, func(player players.Player) (players.PlayerResponse, error) {
+			return player.ToResponse()
+		})
+		responses.RespondJSON(w, 200, playerResps)
 	})
 
 	//Returns the player who's id matches the query
 	mux.HandleFunc("/api/player/{id}", func(w http.ResponseWriter, req *http.Request) {
 		searchId := req.PathValue("id")
-		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/%s", searchId)
-		players, err := getPlayers(searchUrl)
+		searchUrl := fmt.Sprintf("https://statsapi.mlb.com/api/v1/people/%s?hydrate=currentTeam", searchId)
+		playersList, err := getPlayers(searchUrl)
 		if err != nil {
 			responses.RespondError(w, 404, fmt.Sprintf("%v", err))
 			return
 		}
-		if len(players) == 0 {
+		if len(playersList) == 0 {
 			responses.RespondError(w, 404, fmt.Sprintf("No Player with id=%s", searchId))
 			return
 		}
-		responses.RespondJSON(w, 200, players[0])
+		playerResp, err := playersList[0].ToResponse()
+		if err != nil {
+			responses.RespondError(w, 404, fmt.Sprintf("%s %s's data is invalid!", playersList[0].FirstName, playersList[0].LastName))
+		}
+		responses.RespondJSON(w, 200, playerResp)
 	})
 
 	// Serve frontend static files in production

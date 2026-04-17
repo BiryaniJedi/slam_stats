@@ -50,7 +50,7 @@
                             />
                             <div class="player-info">
                                 <span class="player-name">{player.firstName} {player.lastName}</span>
-                                <span class="player-meta">{player.primaryPosition.name} · {player.currentAge} yrs</span>
+                                <span class="player-meta">{player.primaryPosition.name}</span>
                             </div>
                         </a>
                     </li>
