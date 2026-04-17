@@ -1,4 +1,4 @@
--- +goose up
+-- +goose Up
 CREATE TABLE players (
   id INTEGER PRIMARY KEY,
   fname TEXT,
@@ -19,5 +19,5 @@ CREATE TABLE players (
   cur_team_link TEXT
 );
 
--- +goose down
+-- +goose Down
 DROP TABLE players;
