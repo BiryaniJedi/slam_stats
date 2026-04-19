@@ -67,7 +67,7 @@ func main() {
 		}
 		playerResp, err := playersList[0].ToResponse()
 		if err != nil {
-			responses.RespondError(w, 404, fmt.Sprintf("%s %s's data is invalid!", playersList[0].FirstName, playersList[0].LastName))
+			responses.RespondError(w, 404, fmt.Sprintf("%s %s's data is invalid!", *playersList[0].FirstName, *playersList[0].LastName))
 		}
 		responses.RespondJSON(w, 200, playerResp)
 	})
